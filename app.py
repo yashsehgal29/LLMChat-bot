@@ -11,12 +11,11 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 import os
 from dotenv import load_dotenv
 import tempfile
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 load_dotenv()
-
-llm = replicate.Replicate(streaming=True, model="meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
-                            callbacks={StreamingStdOutCallbackHandler()},
-                            input={"temperature": 0.2, "max_length": 500, "top_1": 1})
+llm = replicate.Replicate(streaming=True, model="mistralai/mistral-7b-instruct-v0.1:5fe0a3d7ac2852264a25279d1dfb798acbc4d49711d126646594e212cb821749",
+                            model_kwargs={"temperature": 0.7, "max_length": 1000, "top_1": 1})
 def load_and_initialize_chatbot(file_path):
     text = []
 
@@ -56,15 +55,6 @@ def initial_session():
         st.session_state["past"] = ["Hey!!"]
 
 
-# def conversational_chain(vectorstore):
-#     # load_dotenv()
-   
-    
-#     chain = ConversationalRetrievalChain.from_llm(llm=llm, chain_type="stuff", retriever=vectorstore.as_retriever(search_kwargs={"k": 2}), memory=memory)
-
-#     return chain
-
-
 def conversation_chat(query, chain, history):
     result = chain({"question": query, "chat_history": history})
     history.append((query, result["answer"]))
@@ -72,7 +62,7 @@ def conversation_chat(query, chain, history):
 
 
 def display_history(chain):
-    st.title("Multi-Docs Chatbot")
+  
 
     with st.container():
         with st.form(key="my_form", clear_on_submit=True):
@@ -92,6 +82,7 @@ def display_history(chain):
 
 
 def main():
+    st.title("Multi-Docs Chatbot")
     initial_session()
 
     # Specify the correct path to the file you want to use as input
